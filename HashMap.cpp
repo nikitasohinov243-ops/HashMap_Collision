@@ -24,9 +24,20 @@ class HashMap{
     HashMap(size_t capacity = 8): buckets_(capacity, nullptr), size_(0){}
     ~HashMap()
     {
-
+        for (size_t i = 0;i < buckets_.size();i++ )
+        {
+            Node* current = buckets_[i];
+            while(current != nullptr)
+            {
+                Node* next = current->next;//обращаемся к куче, а не массиву buckets_
+                delete current;
+                current = next;
+            }
+        }
     };
 
-    void insert(const std::string& key, int value){};
+    void insert(const std::string& key, int value){
+        
+    };
     int* find(const std::string& key){};
 };
