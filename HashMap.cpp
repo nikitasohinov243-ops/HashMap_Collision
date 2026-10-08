@@ -37,7 +37,22 @@ class HashMap{
     };
 
     void insert(const std::string& key, int value){
-        
+        size_t idx = index(key);//индекс новой пары
+
+        Node* current = buckets_[idx];//новая пара в узле
+        while(current != nullptr) //проходимся по узлу
+        {
+            if (current->key == key)//ключи совпали -> обновляем значение
+            {
+                current->value = value;
+                return;
+            }
+            current = current->next; // иначе переходим дальше
+        }
+        // Если мы здесь значит ключа не было в цепочке
+        Node* NewNode = new Node{key, value, buckets_[idx]};//если не встретился, то ставим в начало узла новую пару 
+        buckets_[idx] = NewNode;//иницилизация новой первой пары узла 
+        // теперь корзина указывает на новый первый узел
     };
     int* find(const std::string& key){};
 };
