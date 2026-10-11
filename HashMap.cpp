@@ -34,7 +34,7 @@ class HashMap{
                 current = next;
             }
         }
-    };
+    }
 
     void insert(const std::string& key, int value){
         size_t idx = index(key);//индекс новой пары
@@ -53,7 +53,8 @@ class HashMap{
         Node* NewNode = new Node{key, value, buckets_[idx]};//если не встретился, то ставим в начало узла новую пару 
         buckets_[idx] = NewNode;//иницилизация новой первой пары узла 
         // теперь корзина указывает на новый первый узел
-    };
+        ++size_;
+    }
     int* find(const std::string& key)const{
         Node* current = buckets_[index(key)];
         while(current != nullptr)
@@ -65,9 +66,20 @@ class HashMap{
             current = current->next;
         }
         return nullptr;
-    };
+    }
+    int *find(const std::string &key)
+    {
+        Node *current = buckets_[index(key)];
+        while (current != nullptr)
+        {
+            if (current->key == key) return &current->value;
+            current = current->next;
+        }
+        return nullptr;
+    }
     bool erase(const std::string& key){
-        Node* current = buckets_[index(key)];
+        size_t idx = index(key);
+        Node* current = buckets_[idx];
         Node* prev = nullptr;
         
         while (current != nullptr)
@@ -76,21 +88,36 @@ class HashMap{
             {
                 if(prev == nullptr)
                 {
-                    current = current->next;
+                    buckets_[idx] = current->next;//вырезаем голову
                 }
                 else
                 {
-                    prev->next = current->next;
+                    prev->next = current->next;//вырезаем промежуток
                 }
                 delete current;
-                size_--;
+                --size_;
                 return true;
             }
             prev = current;
             current = current->next;
         }
+        return false;
     }
     size_t size() const{
-        
+        return size_;
+    }
+    size_t capacity() const
+    {
+        return buckets_.size();
+    }
+    size_t size_buckets(const std::string& key) const{
+        Node* current = buckets_[index(key)];
+        size_t count = 0;
+        while (current != nullptr)
+        {
+            ++count;
+            current = current->next;
+        }
+        return count;
     }
 };
