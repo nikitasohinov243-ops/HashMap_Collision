@@ -66,4 +66,31 @@ class HashMap{
         }
         return nullptr;
     };
+    bool erase(const std::string& key){
+        Node* current = buckets_[index(key)];
+        Node* prev = nullptr;
+        
+        while (current != nullptr)
+        {
+            if(current->key == key)
+            {
+                if(prev == nullptr)
+                {
+                    current = current->next;
+                }
+                else
+                {
+                    prev->next = current->next;
+                }
+                delete current;
+                size_--;
+                return true;
+            }
+            prev = current;
+            current = current->next;
+        }
+    }
+    size_t size() const{
+        
+    }
 };
