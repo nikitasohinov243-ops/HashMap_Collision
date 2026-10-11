@@ -54,5 +54,16 @@ class HashMap{
         buckets_[idx] = NewNode;//иницилизация новой первой пары узла 
         // теперь корзина указывает на новый первый узел
     };
-    int* find(const std::string& key){};
+    int* find(const std::string& key)const{
+        Node* current = buckets_[index(key)];
+        while(current != nullptr)
+        {
+            if (current->key == key)
+            {
+                return &current->value;
+            }
+            current = current->next;
+        }
+        return nullptr;
+    };
 };
