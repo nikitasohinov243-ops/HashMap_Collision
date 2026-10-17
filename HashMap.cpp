@@ -21,7 +21,12 @@ class HashMap{
         return std::hash<std::string>{}(key) % buckets_.size();
     }
     public:
-    HashMap(size_t capacity = 8): buckets_(capacity, nullptr), size_(0){}
+    HashMap(size_t capacity = 8): buckets_(capacity, nullptr), size_(0){
+        if (capacity == 0)
+        {
+            throw std::invalid_argument("Capacity must be greater than 0");
+        }
+    }
     ~HashMap()
     {
         for (size_t i = 0;i < buckets_.size();i++ )
@@ -54,15 +59,15 @@ class HashMap{
         buckets_[idx] = NewNode;//иницилизация новой первой пары узла 
         // теперь корзина указывает на новый первый узел
         ++size_;
+        if(static_cast<double>(size_)/buckets_.size() > 0.75) rehash(buckets_.size()*2);
     }
-    int* find(const std::string& key)const{
-        Node* current = buckets_[index(key)];
-        while(current != nullptr)
+    const int *find(const std::string &key) const
+    {
+        const Node *current = buckets_[index(key)];
+        while (current != nullptr)
         {
             if (current->key == key)
-            {
                 return &current->value;
-            }
             current = current->next;
         }
         return nullptr;
@@ -120,4 +125,36 @@ class HashMap{
         }
         return count;
     }
+    void rehash(size_t new_capacity){
+        std::vector<Node*> new_buckets_(new_capacity, nullptr);
+        for(size_t i = 0; i<buckets_.size(); ++i)
+        {
+            Node* current = buckets_[i];
+            while(current != nullptr)
+            {
+                Node* next = current -> next;
+                size_t idx = std::hash<std::string>{}(current -> key) % new_capacity;
+                current -> next = new_buckets_[idx];
+                new_buckets_[idx] = current;
+                current = next;
+            }
+        }
+        buckets_.swap(new_buckets_);
+    }
 };
+
+int main() {
+    HashMap m(2);
+    for (int i = 0; i < 1000; ++i)
+        m.insert("key" + std::to_string(i), i);
+
+    std::cout << m.size() << "\n";       // 1000
+    std::cout << m.capacity() << "\n";   // должно сильно вырасти (степень двойки)
+
+    bool ok = true;
+    for (int i = 0; i < 1000; ++i) {
+        int* p = m.find("key" + std::to_string(i));
+        if (!p || *p != i) ok = false;
+    }
+    std::cout << (ok ? "всё на месте" : "ОШИБКА") << "\n";
+}
