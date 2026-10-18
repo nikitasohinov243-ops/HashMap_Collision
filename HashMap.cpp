@@ -141,20 +141,23 @@ class HashMap{
         }
         buckets_.swap(new_buckets_);
     }
+
+    int& operator[](const std::string& key){
+        int *p = find(key);
+        if (p) return *p;
+
+        insert(key, 0);
+        return *find(key);
+    }
 };
 
 int main() {
-    HashMap m(2);
-    for (int i = 0; i < 1000; ++i)
-        m.insert("key" + std::to_string(i), i);
-
-    std::cout << m.size() << "\n";       // 1000
-    std::cout << m.capacity() << "\n";   // должно сильно вырасти (степень двойки)
-
-    bool ok = true;
-    for (int i = 0; i < 1000; ++i) {
-        int* p = m.find("key" + std::to_string(i));
-        if (!p || *p != i) ok = false;
-    }
-    std::cout << (ok ? "всё на месте" : "ОШИБКА") << "\n";
+    HashMap m;
+    m["a"] = 1;
+    m["a"] += 10;
+    std::cout << m["a"] << "\n";      // 11
+    std::cout << m.size() << "\n";    // 1
+    std::cout << m["zzz"] << "\n";    // 0
+    std::cout << m.size() << "\n";    // 2, чтение вставило ключ
+    return 0;
 }
