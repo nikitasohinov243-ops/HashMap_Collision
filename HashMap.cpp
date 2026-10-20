@@ -61,7 +61,7 @@ class HashMap{
         ++size_;
         if(static_cast<double>(size_)/buckets_.size() > 0.75) rehash(buckets_.size()*2);
     }
-    const int *find(const K& key) const
+    const V *find(const K& key) const
     {
         const Node *current = buckets_[index(key)];
         while (current != nullptr)
@@ -72,7 +72,7 @@ class HashMap{
         }
         return nullptr;
     }
-    int *find(const K& key)
+    V *find(const K& key)
     {
         Node *current = buckets_[index(key)];
         while (current != nullptr)
@@ -142,8 +142,8 @@ class HashMap{
         buckets_.swap(new_buckets_);
     }
 
-    int& operator[](const K& key){
-        int *p = find(key);
+    V& operator[](const K& key){
+        V *p = find(key);
         if (p) return *p;
 
         insert(key, V{});
