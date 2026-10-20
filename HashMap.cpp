@@ -3,22 +3,22 @@
 #include <vector>
 #include <functional>
 
-
+template <typename K, typename V, typename Hash = std::hash<K>>
 class HashMap{
     private:
     struct Node
     {
-        std::string key;
-        int value;
+        K key;
+        V value;
         Node* next;
     };
 
     std::vector<Node*> buckets_;
     size_t size_;
 
-    size_t index(const std::string& key) const
+    size_t index(const K& key) const
     {
-        return std::hash<std::string>{}(key) % buckets_.size();
+        return Hash{}(key) % buckets_.size();
     }
     public:
     HashMap(size_t capacity = 8): buckets_(capacity, nullptr), size_(0){
@@ -41,7 +41,7 @@ class HashMap{
         }
     }
 
-    void insert(const std::string& key, int value){
+    void insert(const K& key, V value){
         size_t idx = index(key);//индекс новой пары
 
         Node* current = buckets_[idx];//новая пара в узле
@@ -61,7 +61,7 @@ class HashMap{
         ++size_;
         if(static_cast<double>(size_)/buckets_.size() > 0.75) rehash(buckets_.size()*2);
     }
-    const int *find(const std::string &key) const
+    const int *find(const K& key) const
     {
         const Node *current = buckets_[index(key)];
         while (current != nullptr)
@@ -72,7 +72,7 @@ class HashMap{
         }
         return nullptr;
     }
-    int *find(const std::string &key)
+    int *find(const K& key)
     {
         Node *current = buckets_[index(key)];
         while (current != nullptr)
@@ -82,7 +82,7 @@ class HashMap{
         }
         return nullptr;
     }
-    bool erase(const std::string& key){
+    bool erase(const K& key){
         size_t idx = index(key);
         Node* current = buckets_[idx];
         Node* prev = nullptr;
@@ -115,7 +115,7 @@ class HashMap{
     {
         return buckets_.size();
     }
-    size_t size_buckets(const std::string& key) const{
+    size_t size_buckets(const K& key) const{
         Node* current = buckets_[index(key)];
         size_t count = 0;
         while (current != nullptr)
@@ -133,7 +133,7 @@ class HashMap{
             while(current != nullptr)
             {
                 Node* next = current -> next;
-                size_t idx = std::hash<std::string>{}(current -> key) % new_capacity;
+                size_t idx = Hash{}(current -> key) % new_capacity;
                 current -> next = new_buckets_[idx];
                 new_buckets_[idx] = current;
                 current = next;
@@ -142,17 +142,18 @@ class HashMap{
         buckets_.swap(new_buckets_);
     }
 
-    int& operator[](const std::string& key){
+    int& operator[](const K& key){
         int *p = find(key);
         if (p) return *p;
 
-        insert(key, 0);
+        insert(key, V{});
         return *find(key);
     }
+
 };
 
 int main() {
-    HashMap m;
+    HashMap <std::string, int> m;
     m["a"] = 1;
     m["a"] += 10;
     std::cout << m["a"] << "\n";      // 11

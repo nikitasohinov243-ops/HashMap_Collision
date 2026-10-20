@@ -1,0 +1,21 @@
+# Сборка
+build/
+bin/
+*.o
+*.obj
+*.out
+*.exe
+*.a
+*.so
+*.dylib
+
+# Бинарник без расширения (подставь своё имя)
+HashMap
+
+# macOS
+.DS_Store
+*.dSYM/
+
+# Редакторы
+.vscode/
+.idea/
