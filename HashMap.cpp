@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <stdexcept>
 
 template <typename K, typename V, typename Hash = std::hash<K>>
 class HashMap{
@@ -20,15 +21,7 @@ class HashMap{
     {
         return Hash{}(key) % buckets_.size();
     }
-    public:
-    HashMap(size_t capacity = 8): buckets_(capacity, nullptr), size_(0){
-        if (capacity == 0)
-        {
-            throw std::invalid_argument("Capacity must be greater than 0");
-        }
-    }
-    ~HashMap()
-    {
+    void clear() noexcept{
         for (size_t i = 0;i < buckets_.size();i++ )
         {
             Node* current = buckets_[i];
@@ -38,9 +31,48 @@ class HashMap{
                 delete current;
                 current = next;
             }
+            buckets_[i] = nullptr;
+        }
+        size_ = 0;
+    }
+    void rehash(size_t new_capacity){
+        std::vector<Node*> new_buckets_(new_capacity, nullptr);
+        for(size_t i = 0; i<buckets_.size(); ++i)
+        {
+            Node* current = buckets_[i];
+            while(current != nullptr)
+            {
+                Node* next = current -> next;
+                size_t idx = Hash{}(current -> key) % new_capacity;
+                current -> next = new_buckets_[idx];
+                new_buckets_[idx] = current;
+                current = next;
+            }
+        }
+        buckets_.swap(new_buckets_);
+    }
+    public:
+    HashMap(size_t capacity = 8): buckets_(capacity, nullptr), size_(0){
+        if (capacity == 0)
+        {
+            throw std::invalid_argument("Capacity must be greater than 0");
         }
     }
-
+    HashMap(const HashMap& other):buckets_(other.buckets_.size(), nullptr), size_(0){ //глубокое копирование
+        try{
+            for(size_t i = 0; i < buckets_.size(); ++i)
+            {
+                for(const Node* cur = other.buckets_[i]; cur != nullptr; cur = cur->next)
+                {
+                    Node* NewNode = new Node{cur -> key,cur -> value, buckets_[i]};
+                    buckets_[i] = NewNode;
+                    ++size_;
+                }
+            }
+        }
+        catch(...){clear(); throw;}
+    }
+    ~HashMap(){ clear(); }
     void insert(const K& key, V value){
         size_t idx = index(key);//индекс новой пары
 
@@ -124,22 +156,6 @@ class HashMap{
             current = current->next;
         }
         return count;
-    }
-    void rehash(size_t new_capacity){
-        std::vector<Node*> new_buckets_(new_capacity, nullptr);
-        for(size_t i = 0; i<buckets_.size(); ++i)
-        {
-            Node* current = buckets_[i];
-            while(current != nullptr)
-            {
-                Node* next = current -> next;
-                size_t idx = Hash{}(current -> key) % new_capacity;
-                current -> next = new_buckets_[idx];
-                new_buckets_[idx] = current;
-                current = next;
-            }
-        }
-        buckets_.swap(new_buckets_);
     }
 
     V& operator[](const K& key){
