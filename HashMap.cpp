@@ -72,6 +72,11 @@ class HashMap{
         }
         catch(...){clear(); throw;}
     }
+    HashMap(HashMap&& other) noexcept: buckets_(std::move(other.buckets_)), size_(other.size_)
+    {
+        other.buckets_.assign(1, nullptr);
+        other.size_ = 0;
+    }
     ~HashMap(){ clear(); }
     void insert(const K& key, V value){
         size_t idx = index(key);//индекс новой пары
@@ -142,10 +147,6 @@ class HashMap{
     }
     size_t size() const{
         return size_;
-    }
-    size_t capacity() const
-    {
-        return buckets_.size();
     }
     size_t size_buckets(const K& key) const{
         Node* current = buckets_[index(key)];
