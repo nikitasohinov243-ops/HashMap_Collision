@@ -73,7 +73,7 @@ class HashMap{
         }
         catch(...){clear(); throw;}
     }
-    HashMap(HashMap&& other) noexcept: buckets_(std::move(other.buckets_)), size_(other.size_)
+    HashMap(HashMap&& other) noexcept: buckets_(std::move(other.buckets_)), size_(other.size_)//перемещение
     {
         other.buckets_.assign(1, nullptr);
         other.size_ = 0;
@@ -183,15 +183,16 @@ int main() {
     for (int i = 0; i < 100; ++i)
         a["k" + std::to_string(i)] = i;
 
-    HashMap<std::string, int> b = a; // копия
+    HashMap<std::string, int> b(a); // копия
     b["k0"] = 999;
     std::cout << a["k0"] << " " << b["k0"] << "\n"; // 0 999 (таблицы независимы)
 
-    HashMap<std::string, int> c = std::move(a);       // перемещение
+    HashMap<std::string, int> c (std::move(a));       // перемещение
     std::cout << c.size() << " " << a.size() << "\n"; // 100 0
     a["new"] = 1;                                     // перемещённый объект не сломан
     std::cout << a.size() << "\n";                    // 1
 
+    
     b = c;                         // копирующее присваивание
     c = std::move(b);              // перемещающее
     c = c;                         // самоприсваивание, ничего не ломается
