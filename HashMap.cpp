@@ -3,6 +3,7 @@
 #include <vector>
 #include <functional>
 #include <stdexcept>
+#include <utility>
 
 template <typename K, typename V, typename Hash = std::hash<K>>
 class HashMap{
@@ -119,6 +120,14 @@ class HashMap{
         }
         return nullptr;
     }
+    void swap(HashMap& other) noexcept { //noexcept нужен для того что бы выйграть на копировании (обещаем, что не бросит исключение)
+        buckets_.swap(other.buckets_);
+        std::swap(size_, other.size_);
+    }
+    HashMap& operator=(HashMap other) noexcept{
+        swap(other);
+        return *this;
+    }
     bool erase(const K& key){
         size_t idx = index(key);
         Node* current = buckets_[idx];
@@ -170,12 +179,21 @@ class HashMap{
 };
 
 int main() {
-    HashMap <std::string, int> m;
-    m["a"] = 1;
-    m["a"] += 10;
-    std::cout << m["a"] << "\n";      // 11
-    std::cout << m.size() << "\n";    // 1
-    std::cout << m["zzz"] << "\n";    // 0
-    std::cout << m.size() << "\n";    // 2, чтение вставило ключ
-    return 0;
+    HashMap<std::string, int> a;
+    for (int i = 0; i < 100; ++i)
+        a["k" + std::to_string(i)] = i;
+
+    HashMap<std::string, int> b = a; // копия
+    b["k0"] = 999;
+    std::cout << a["k0"] << " " << b["k0"] << "\n"; // 0 999 (таблицы независимы)
+
+    HashMap<std::string, int> c = std::move(a);       // перемещение
+    std::cout << c.size() << " " << a.size() << "\n"; // 100 0
+    a["new"] = 1;                                     // перемещённый объект не сломан
+    std::cout << a.size() << "\n";                    // 1
+
+    b = c;                         // копирующее присваивание
+    c = std::move(b);              // перемещающее
+    c = c;                         // самоприсваивание, ничего не ломается
+    std::cout << c.size() << "\n"; // 100
 }
