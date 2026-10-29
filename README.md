@@ -1,7 +1,14 @@
 Своя реализация HashMap<K, V> с шаблонами. Разрешение коллизий цепочками и открытой адресацией, ребалансировка, итераторы.
+
 Хэш-таблица изнутри: хэш-функцию, цепочки, load factor и rehash.
+
 Управление памятью: new/delete, деструктор и правило пяти (копирование, перемещение, swap, copy-and-swap).
+
 Шаблоны: HashMap<K, V, Hash>, требования к типам, всё в заголовке.
+
 Константность: две версии find, begin()/end() и const_iterator.
+
 Итераторы: двухуровневый обход, std::pair<const K, V>, префиксный и постфиксный ++.
+
 Рабочий процесс: санитайзеры, тесты на assert, tasks.json, .gitignore, pull --rebase и push.
+Сборка: mkdir -p build && g++ -std=c++17 -Wall -Wextra -g -fsanitize=address,undefined main.cpp -o build/main && ./build/main
