@@ -11,6 +11,7 @@ bin/
 
 # Бинарник без расширения (подставь своё имя)
 HashMap
+main
 
 # macOS
 .DS_Store
