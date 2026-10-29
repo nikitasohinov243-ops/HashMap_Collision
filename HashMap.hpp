@@ -4,7 +4,6 @@
 #include <utility>
 #include <vector>
 #include <cstddef>
-#include <cassert>
 
 template <typename K, typename V, typename Hash = std::hash<K>>
 class HashMap {
